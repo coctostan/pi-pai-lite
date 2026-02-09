@@ -1,5 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { registerMemoryTool } from "./src/memory.js";
 
 export default function (pi: ExtensionAPI) {
-  // Tools and commands will be registered here
+  registerMemoryTool(pi);
 }
