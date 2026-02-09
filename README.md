@@ -29,18 +29,11 @@ Everything else — Telos, Skill System, Hook System, Agent Factory, Voice Syste
 
 ## Install
 
-Copy the extension to your pi extensions directory:
-
 ```bash
-# Clone
-git clone https://github.com/coctostan/pi-pai-lite.git
-
-# Install
-mkdir -p ~/.pi/agent/extensions/pi-pai-lite
-cp -r pi-pai-lite/index.ts pi-pai-lite/src/ pi-pai-lite/README.md ~/.pi/agent/extensions/pi-pai-lite/
+pi install npm:pi-pai-lite
 ```
 
-Or for development/testing:
+For development/testing without installing:
 
 ```bash
 pi -e ./index.ts
