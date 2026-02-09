@@ -31,6 +31,9 @@ function matchesAny(text: string, patterns: RegExp[]): boolean {
   return patterns.some((p) => p.test(text));
 }
 
+// Priority order: red_team > first_principles > be_creative > council (default).
+// Security/risk keywords take highest priority. If no patterns match, council
+// is the safest default as the most general-purpose mode.
 export function autoSelectMode(problem: string): ThinkMode {
   if (matchesAny(problem, RED_TEAM_PATTERNS)) return "red_team";
   if (matchesAny(problem, FIRST_PRINCIPLES_PATTERNS)) return "first_principles";

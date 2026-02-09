@@ -1,10 +1,11 @@
 import * as fs from "node:fs";
+import { homedir } from "node:os";
 import * as path from "node:path";
 import { StringEnum } from "@mariozechner/pi-ai";
 import { Type } from "@sinclair/typebox";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
-const MEMORY_DIR = path.join(process.env.HOME ?? "~", ".pi", "pai");
+const MEMORY_DIR = path.join(homedir(), ".pi", "pai");
 
 const MEMORY_FILES = {
   preferences: "preferences.md",
@@ -12,7 +13,7 @@ const MEMORY_FILES = {
   context: "context.md",
 } as const;
 
-const MAX_READ_BYTES = 4096; // 4KB truncation limit
+const MAX_READ_CHARS = 4096; // 4K character truncation limit
 
 function ensureDir() {
   if (!fs.existsSync(MEMORY_DIR)) {
@@ -31,8 +32,8 @@ export function readMemoryFile(file: keyof typeof MEMORY_FILES): string {
       return "";
     }
     const content = fs.readFileSync(fp, "utf-8");
-    if (content.length > MAX_READ_BYTES) {
-      const truncated = content.slice(-MAX_READ_BYTES);
+    if (content.length > MAX_READ_CHARS) {
+      const truncated = content.slice(-MAX_READ_CHARS);
       return `[truncated — showing last 4KB of ${fp}]\n\n${truncated}`;
     }
     return content;
@@ -91,17 +92,15 @@ export function registerMemoryTool(pi: ExtensionAPI) {
                     text: `Memory file '${file}' is empty or hasn't been created yet. Use append or replace to add content.`,
                   },
                 ],
+                details: {},
               };
             }
-            return { content: [{ type: "text" as const, text: data }] };
+            return { content: [{ type: "text" as const, text: data }], details: {} };
           }
 
           case "append": {
             if (!content) {
-              return {
-                content: [{ type: "text" as const, text: "Error: content is required for append." }],
-                isError: true,
-              };
+              throw new Error("content is required for append");
             }
             const fp = filePath(file);
             const timestamp = new Date().toISOString();
@@ -109,33 +108,24 @@ export function registerMemoryTool(pi: ExtensionAPI) {
             fs.appendFileSync(fp, entry, "utf-8");
             return {
               content: [{ type: "text" as const, text: `Appended to ${file}.` }],
+              details: {},
             };
           }
 
           case "replace": {
             if (!content) {
-              return {
-                content: [{ type: "text" as const, text: "Error: content is required for replace." }],
-                isError: true,
-              };
+              throw new Error("content is required for replace");
             }
             const fp = filePath(file);
             fs.writeFileSync(fp, content, "utf-8");
             return {
               content: [{ type: "text" as const, text: `Replaced contents of ${file}.` }],
+              details: {},
             };
           }
         }
       } catch (err) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Memory error: ${err instanceof Error ? err.message : String(err)}`,
-            },
-          ],
-          isError: true,
-        };
+        throw err instanceof Error ? err : new Error(String(err));
       }
     },
   });

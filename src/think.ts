@@ -106,15 +106,7 @@ export function registerThinkTool(pi: ExtensionAPI) {
           ctx.ui.setStatus("pai", undefined);
         }
 
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Think tool error: ${err instanceof Error ? err.message : String(err)}`,
-            },
-          ],
-          isError: true,
-        };
+        throw err instanceof Error ? err : new Error(String(err));
       }
     },
   });
