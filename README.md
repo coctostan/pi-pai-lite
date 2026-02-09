@@ -1,6 +1,12 @@
+<div align="center">
+
+<img src="images/banner.jpg" alt="pi-pai-lite — The Skeptic, The Red Team, The Scientist, and The Creative surround a developer at their workstation" width="800">
+
 # pi-pai-lite
 
 Structured thinking modes and lightweight persistent memory for [pi](https://github.com/badlogic/pi-mono).
+
+</div>
 
 ## Origin
 
